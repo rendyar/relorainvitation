@@ -174,7 +174,7 @@ class TypeInvitationController extends Controller
         ]);
 
         try {
-            Excel::import(new InvitationsImport, $request->file('file'));
+            Excel::queueImport( new InvitationsImport, $request->file('file'));
             return redirect()->route('type-invitation.index')->with('success', 'Type Invitations imported successfully.');
         } catch (\Exception $e) {
             return redirect()->route('type-invitation.index')->with('error', 'There was an error importing the file: ' . $e->getMessage());
