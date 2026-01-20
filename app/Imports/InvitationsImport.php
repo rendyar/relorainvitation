@@ -2,31 +2,26 @@
 
 namespace App\Imports;
 
-use App\Models\Invitation;
-use App\Models\Souvenir;
-use App\Models\TypeInvitation;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ShouldQueueWithoutChain;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class InvitationsImport implements ToModel, WithHeadingRow, ShouldQueueWithoutChain
+class InvitationsImport implements WithMultipleSheets, ShouldQueueWithoutChain
 {
-    public function model(array $row)
+    public function __construct()
     {
-        $typeInvitation = TypeInvitation::where(
-            'name',
-            strtolower(trim($row['type_undangan']))
-        )->first();
+        Log::info('[InvitationsImport] Job STARTED');
+    }
 
-        $souvenir = Souvenir::where(
-            'name',
-            strtolower(trim($row['souvenir']))
-        )->first();
+    public function sheets(): array
+    {
+        return [
+            'Data' => new InvitationsDataSheet,
+        ];
+    }
 
-        return new Invitation([
-            'name' => $row['nama'],
-            'type_invitation_id' => $typeInvitation->id,
-            'souvenir_id' => $souvenir->id,
-        ]);
+    public function __destruct()
+    {
+        Log::info('[InvitationsImport] Job FINISHED');
     }
 }
